@@ -62,6 +62,36 @@
         2. 防止过拟合：由于使用了Bagging和随机特征选择，随机森林减少了模型的方差，从而降低了过拟合的风险。
         3. 鲁棒性：随机森林对数据中的噪声和异常值不敏感，表现稳定。
         4. 特征重要性：随机森林可以自动计算出特征的重要性，帮助我们理解哪些特征对模型的决策最为重要。
+3. Gradient Boosting：这是一种强大的集成学习方法，主要用于回归和分类任务。它通过逐步构建多个弱学习器（通常是决策树），并将它们组合起来，形成一个强大的预测模型。
+    1. 工作原理：
+        1. 初始化模型：首先，使用一个简单的模型（如常数模型）来初始化预测。
+
+        2. 计算残差：在每一步中，计算当前模型的残差，即预测值与真实值之间的差异。这些残差反映了模型的误差。
+
+        3. 拟合新模型：针对残差拟合一个新的弱学习器（如决策树），使得新的学习器能够尽可能减少这些残差。
+
+        4. 更新模型：将新学习器与之前的模型组合起来，更新模型的预测。这个组合通常通过加权求和的方式完成。
+
+        5. 迭代：重复上述步骤，继续拟合新的学习器并更新模型，直到达到预定的迭代次数或模型误差达到可以接受的水平。
+    2. 优点：
+        1. 高准确性：梯度提升方法通常能够实现很高的预测准确性，尤其是在结构复杂的数据上。
+        2. 灵活性：它可以应用于各种类型的数据（分类、回归）和损失函数。
+        3. 自动特征选择：在训练过程中，梯度提升会自动选择最重要的特征进行学习。
+4. CatBoost：是一种专门为处理类别型特征优化的梯度提升算法。
+    1. 工作原理：
+        1. Ordered Boosting：为了解决梯度提升中的预测偏差问题，CatBoost使用了一种叫做"ordered boosting"的技术。这个方法将训练数据划分为多个顺序排列的块，每个块只使用前面的块来进行模型训练，避免了信息泄露。
+
+        2. 目标编码（Target Encoding）：对于类别型特征，CatBoost通过一种先进的目标编码技术来转换类别型数据。这个方法不会引入过多的噪声，同时避免了传统编码方式中可能导致的过拟合问题。
+
+        3. 对称树（Symmetric Trees）：CatBoost使用对称树结构，这种树结构在构造时会选择所有分裂节点在相同的深度进行分裂，从而提高了模型的训练速度和预测速度。
+    2. 优点：
+        1. 易用性：CatBoost可以直接处理包含类别型特征的数据集，不需要额外的编码或转换。
+
+        2. 高性能：在处理大规模数据集时，CatBoost的训练速度非常快，尤其是在GPU上的表现尤为出色。
+
+        3. 鲁棒性：CatBoost具有很强的鲁棒性，减少了模型的调参需求，同时具有很好的泛化能力。
+
+        4. 开箱即用：CatBoost在默认设置下就能提供非常强的表现，使得新手和专家都能轻松使用。
 
 ### 模型训练
 #### 我们的算法
@@ -128,5 +158,56 @@
         #评估模型
         accuracy = accuracy_score(y_test, y_pred)
         print(f"Model accuracy: {accuracy}")
+        ```
     5. 可视化：`sklearn.tree.export_text`
 2. Random Forest：
+    1. 使用RandomForestClassifier创建并训练随机森林模型：
+        ```
+        rf_clf = RandomForestClassifier(n_estimators=100, random_state=42)
+        rf_clf.fit(X_train, y_train)
+        ```
+    2. 模型预测与评估:
+        ```
+        # 预测测试集
+        y_pred = rf_clf.predict(X_test)
+
+        # 评估模型
+        accuracy = accuracy_score(y_test, y_pred)
+        print(f"Model accuracy: {accuracy}")
+        ```
+3. Gradient Boosting：
+    1. 使用GradientBoostingClassifier来创建并训练模型：
+        ```
+        # 初始化梯度提升分类器
+        gb_clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
+
+        # 训练模型
+        gb_clf.fit(X_train, y_train)
+        ```
+    2. 模型预测与评估:
+        ```
+        # 预测测试集
+        y_pred = gb_clf.predict(X_test)
+
+        # 评估模型
+        accuracy = accuracy_score(y_test, y_pred)
+        print(f"Model accuracy: {accuracy}")
+        ```
+4. CatBoost：
+    1. 初始化CatBoost分类器
+        ```
+        model = CatBoostClassifier(iterations=100, learning_rate=0.1, depth=3, cat_features=categorical_features_indices, verbose=False)
+        ```
+    2. 训练模型
+        ```
+        model.fit(X_train, y_train)
+        ```
+    3. 模型评估与预测
+        ```
+        # 预测测试集
+        y_pred = model.predict(X_test)
+
+        # 评估模型
+        accuracy = accuracy_score(y_test, y_pred)
+        ```
+

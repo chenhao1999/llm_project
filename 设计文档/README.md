@@ -6,6 +6,7 @@
 2. 对处理完的特征，通过调研，使用过采样+网格搜索+留一验证作为机器学习模型，同时选择Decision Tree，Random Forest，Gradient Boosting，CatBoost这4种经典的算法进行实验以及对比。
 3. 代入数据集分别进行实验。
 4. 对4种算法的结果进行结果可视化，分析对比各自的优势以及最终效果。
+5. 将训练好的模型，使用docker封装成容器。
 ### 数据处理
 1. 通过人工进行初步分析，找出可能有用的或是可能对话单造成影响的信息类型作为特征。
 2. 数据清洗：
@@ -210,4 +211,14 @@
         # 评估模型
         accuracy = accuracy_score(y_test, y_pred)
         ```
+### 封装成容器
+1. 安装好docker并编写一个Python脚本来加载和预测模型。
+2. 构建docker镜像，参考代码如下：
+    ```
+    docker build -t my-catboost-model .
+    ```
+3. 运行docker容器，通过挂载的方式，把要预测的PE12数据挂载到data路径下，可以调用模型对结果进行预测。参考代码如下：
+    ```
+    docker run -rm -v ./myroot my-catboost-model
+    ```
 
